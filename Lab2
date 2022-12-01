@@ -1,0 +1,86 @@
+1. Display the date of exam as the following: day 'month name' year.
+    mysql> select id, date_format(date, '%D, %M, %Y')
+           from exam;
+
+2. Display name and age of each student.
+    mysql> select name, date_format(from_days(datediff(now(),birth_date)), '%Y')+0 as Age 
+           from student;
+
+3. Display the name of students with their rounded score in each exam.
+    mysql> select s.name, sg.exam_id, round(sg.grade) as 'rounded score' 
+           from student s left join stu_grades sg 
+           on s.id = sg.stu_id;
+
+4. Display the name of students with the year of birthdate.
+    mysql> select name, date_format(birth_date, '%Y') as 'year'
+           from student;
+
+5. Create hello world function which take username and return welcome message to user using his name.
+    mysql> create function hello_world(username varchar(20))
+           returns varchar(20)
+           no sql
+           begin
+           declare uname varchar(20);
+           set uname = concat("Hello", " ", username);
+           return uname;
+           end/
+
+6. Create multiply function which take two number and return the multiply of them.
+    mysql> create function multiply(num1 int, num2 int) 
+           returns int 
+           no sql 
+           begin 
+           declare ans int; 
+           set ans = num1 * num2; 
+           return ans; 
+           end/
+
+7. Create function which takes student id and exam id and return score the student in exam.
+    mysql> create function get_student_grade(student_id int, student_exam_id int) 
+           returns int 
+           reads sql data 
+           begin 
+           declare student_exam_grade int; 
+           select grade into student_exam_grade 
+           from stu_grades 
+           where student_id = stu_id and student_exam_id = exam_id; 
+           return student_exam_grade; 
+           end/
+
+8. Create function which take subject name and return the max grade for subject.
+    mysql> create function max_grade(subject_name varchar(20)) 
+           returns int 
+           reads sql data 
+           begin 
+           declare max_sgrade int; 
+           select max_score into max_sgrade 
+           from subject 
+           where sub_name = subject_name; 
+           return max_sgrade; 
+           end/
+
+
+9. Create Table called deleted_students which will hold the deleted students’ info (same columns as in student tables)
+    mysql> create table deleted_students like student;
+
+10.Create trigger to save the deleted student from Student table to deleted_students.
+    mysql> create trigger deletedstudents 
+           before delete 
+           on student 
+           for each row 
+           begin 
+           insert into deleted_students 
+           values(old.id, old.name, old.email, old.phone, 
+           old.gender, old.birth_date); 
+           end/
+
+11.Create trigger to save the newly added students to student table to backup_students
+    mysql> create trigger backup
+           after insert
+           on student
+           for each row 
+           begin
+           insert into backup_students 
+           values(new.id, new.name, new.email, 
+           new.phone, new.gender, new.birth_date);
+           end/

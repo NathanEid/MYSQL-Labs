@@ -1,0 +1,114 @@
+1- mysql> create database faculty_db
+   mysql> use faculty_db
+
+2- student (#id, name, email, phone)
+mysql> create table student(
+    -> id int primary key,
+    -> name varchar(20) not null,
+    -> email varchar(30) unique,
+    -> phone int);
+
+3- subject (#id, name, sub_desc, max_score)
+mysql> create table subject(
+    -> id int primary key,
+    -> name varchar(10) not null,
+    -> sub_desc varchar(30), 
+    -> max_score int);
+
+4- exam (#id, date)
+mysql> create table exam(
+    -> id int primary key,
+    -> date date);
+
+5- stu_subjects (#stu_id, #sub_id)
+mysql> create table stu_subjects(
+    -> stu_id int,
+    -> sub_id int,
+    -> primary key(stu_id, sub_id));
+
+6- stu_grades (#stu_id, #sub_id, #exam_id, grade)
+mysql> create stu_grades(
+    -> stu_id int,
+    -> sub_id int,
+    -> exam_id int, 
+    -> grade int,
+    -> primary key(stu_id, sub_id, exam_id));
+
+7- Add gender column for the student table. It holds two values (male or female)
+mysql> alter table student add column (gender varchar(10));
+
+8- Insert your classmates’ data (3 rows for each table)
+mysql> insert into student values
+(1, 'Nathan', 'neso@gamil.com',1272295724, 'male'),
+(2, 'Amgad', 'meg@gmail.com', 1284797058,'male'), 
+(3, 'Sara', 'sara@gmail.com', 1550780607, 'female');
+
+mysql> insert into subject values
+(1, 'DB', 'DataBase',100 ), 
+(2, 'OOP', 'Opject Orinted', 100), 
+(3, 'OS', 'Operating System', 100);
+
+mysql> insert into exam values
+(1,'2022-11-30'),
+(2,'2022-11-29'),
+(3,'2022-11-28');
+
+mysql> insert into stu_subjects values
+(1,1),(1,2),(2,3),(3,2);
+
+mysql> insert into stu_grades values
+(1,1,1,95),(2,3,2,96),(3,3,3,90);
+
+9- Add birth date column for the student table
+mysql> alter table student add column (birth_date date);
+
+10- Add foreign key constrains in Your Tables with options on delete cascaded.
+mysql> alter table stu_subjects add constraint stu_sub_fk1 foreign key(stu_id) 
+    references student(id) on delete cascade;
+
+mysql> alter table stu_subjects add constraint stu_sub_fk2 foreign key(sub_id) 
+    references subject(id) on delete cascade;
+
+mysql> alter table stu_grades add constraint stu_sub_grade_fk2 foreign key(sub_id) 
+    references subject(id) on delete cascade
+
+mysql> alter table stu_grades add constraint stu_sub_grade_fk1 foreign key(stu_id) 
+    references student(id) on delete cascade;
+
+mysql> alter table stu_grades add constraint stu_sub_grade_fk3 foreign key(exam_id) 
+    references exam(id) on delete cascade;
+
+10- Display all students’ information.
+mysql> select * from student;
+
+11- Display the number of males and females.
+mysql> select count(*) , gender from student group by gender;
+
+12- Display male students who are born before 1991-10-01
+mysql> select * from student where gender = 'male' and birth_date < '1991-10-01';
+
+13- Display students’ names that begin with A
+mysql> select * from student where name like 'A%';
+
+14- Display the repeated first names and their counts if higher than 2
+mysql> select name , count(name) as count from student group by name having count > 2;
+
+15- Display students’ names, their score and subject name.
+mysql> select s.name , sg.grade ,sb.name 
+       from student s left join stu_grades sg 
+       on s.id = sg.stu_id 
+       left join subject sb 
+       on sb.id = sg.sub_id;
+
+16- Create view to store students’ name with their subjects’ names.
+#mysql> create view student_subject as
+        select s.name, sb.sub_name 
+        from student s left join stu_subjects 
+        on s.id = stu_subjects.stu_id 
+        left join subject sb 
+        on sb.id = stu_subjects.sub_id;
+
+#mysql> create view student_subject as 
+        select s.name, sub.sub_name 
+        from student s, subject sub, stu_subjects ss 
+        where s.id = ss.stu_id and sub.id = ss.sub_id;
